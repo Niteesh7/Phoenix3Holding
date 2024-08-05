@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaura I³</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+	
+	<link href='https://fonts.googleapis.com/css?family=Acme' rel='stylesheet'>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+	<link rel="stylesheet" href="stylesheets/dashboard.css">
+    <style>
+		:root {
+			--c-level-bg: #143E57;
+			--resident-bg: #EAA432;
+			--restaura-bg: #E65032;
+		}
+
+        body {
+            font-family: 'Acme';
+            text-align: center;
+            background: url('./page-bg.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+			transition: background-color 1s ease-in-out;
+			margin: 0;
+			/* overflow: hidden; */
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+        }
+
+		.page-content {
+			flex: 1;
+		}
+		
+        .bubble-container {
+			display: none;
+			flex-direction: column;
+            margin: 5px auto;
+            width: 80%;
+            transition: transform 1s ease-in-out;
+        }
+		
+        .heading {
+            /* font-size: 36px; */
+			font-size: calc(2rem + 1.5vw);
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #fff;
+            transition: opacity 0.5s ease-in-out;
+        }
+		
+		.heading h2 {
+            margin-bottom: 5px;
+		}
+
+		.personas {
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			margin-bottom: 0; /* Removed margin */
+			flex-direction: column;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: transform 0.5s ease, opacity 0.5s ease, margin-top 1s ease;
+			/* transition: transform 1s ease-in-out, margin-top 1s ease-in-out; */
+			margin-top: 11%;
+		}
+
+		.personas.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+		.personas.shrink {
+			margin-bottom: 0; /* Ensure no margin when shrinking */
+			margin-top: 0;
+		}
+
+		.user-persona-container {
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			margin-bottom: 0; /* Removed margin */
+            /* transform: scale(0.8); */
+            transition: transform 1s ease, opacity 1s ease, flex-direction 1s ease;
+		}
+		
+		.user-persona {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+			justify-content: center;
+            margin: 20px;
+            padding: 20px;
+            /* width: 300px;
+            height: 300px; */
+			
+			width: 325px;
+    		height: 325px;
+            border-radius: 50%;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            position: relative;
+            opacity: 0;
+            transform: scale(0);
+            transition: transform 1.2s, box-shadow 0.3s, width 1s ease-in-out, height 1s ease-in-out, font-size 3s ease-in-out, margin-top 1s ease-in-out ,padding 1s ease-in-out;
+        }
+
+		.user-persona.show {
+			opacity: 1;
+			transform: scale(1);
+		}
+
+        /* .user-persona:nth-child(1) {
+            animation: loadPersona 0.5s ease-in-out forwards 0.2s;
+        }
+
+        .user-persona:nth-child(2) {
+            animation: loadPersona 0.5s ease-in-out forwards 0.4s;
+        }
+
+        .user-persona:nth-child(3) {
+            animation: loadPersona 0.5s ease-in-out forwards 0.6s;
+        }
+
+        @keyframes loadPersona {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        } */
+		
+		.user-persona:hover {
+            transform: scale(1.2);
+        }
+		
+		.user-persona img {
+		    width: 70%;
+			height: 70%;
+			border-radius: 50%;
+		}
+		
+		.user-persona .title {
+			font-size: 22px;
+			/* margin-bottom: 10px;
+			margin-top: 10px; */
+		}
+		
+		.user-persona .persona-title {
+			font-size: 13px;
+		}
+
+		.user-persona.unselected .persona-title {
+			font-size: 10px;
+		}
+		
+        .user-persona i {
+            font-size: 48px;
+            color: #fff;
+        }
+		
+        .user-persona p {
+            /* font-size: 18px; */
+            font-weight: 600;
+            /* color: #fff; */
+        }
+
+        .c-level {
+			background: var(--c-level-bg);
+        }
+        .resident {
+			background: var(--resident-bg);
+        }
+        .restaura {
+			background: var(--restaura-bg);
+        }
+		
+		.spinner-cube {
+			display: none;
+			margin: 0 auto;
+			width: 200px;
+			height: 200px;
+			perspective: 400px;
+			margin-top: 2%;
+			z-index: 1000;
+			/* position: relative; */
+			font-weight: 700;
+			position: absolute;
+    		top: 50%;
+			left: 50%;
+			/* opacity: 0; */
+			animation: shrink-and-fade 2.5s infinite linear;
+		}
+
+		.spinner-cube-inner {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			transform-style: preserve-3d;
+			animation: spin 2s infinite linear;
+		}
+
+		.cube-face {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background: inherit;
+			display: flex;
+			align-items: center;
+			color: #d5cfcf;
+			justify-content: center;
+			font-size: xx-large;
+			font-weight: 900;
+			border: 3px solid;
+		}
+
+		.cube-face:nth-child(1) { transform: translateZ(100px); }
+		.cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(100px); }
+		.cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(100px); }
+		.cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(100px); }
+		.cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(100px); }
+		.cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(100px); }
+
+		@keyframes spin {
+			0% { transform: rotateX(0deg) rotateY(0deg); }
+			100% { transform: rotateX(360deg) rotateY(360deg); }
+		}
+
+		@keyframes shrink-and-fade {
+			0% { 
+				transform: scale(1.3);
+				opacity: 1;
+			}
+			
+			/* 50% { 
+				transform: scale(0.7);
+				opacity: 0.5;
+			} */
+
+			100% { 
+				transform: scale(0);
+				opacity: 0;
+			}
+		}
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+            color: #fff;
+        }
+        .overlay-content {
+            text-align: center;
+        }
+        .overlay-content h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .overlay-content p {
+            font-size: 18px;
+        }
+        .home-button {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #0072ff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .home-button:hover {
+            background-color: #005bb5;
+        }
+		
+		.selected {
+			/* width: 150px;
+			height: 150px; */
+			width: 190px;
+    		height: 190px;
+			border: 2px solid;
+			box-shadow: 0 32px 32px rgba(0, 0, 0, 0.2);
+			/* padding: 40px; */
+		}
+
+		.user-persona-container.exp-selected .selected {
+			padding: 40px;
+		}
+		
+		.selected .title {
+			font-size: 14px;
+			margin-bottom: 5px;
+			margin-top: 1px;
+		}
+		
+		.selected .persona-title {
+			/* margin-top: 1px;
+			margin-bottom: 5px; */
+		}
+
+		.unselected {
+			/* width: 40px;
+    		height: 40px; */
+			width: 80px;
+			height: 80px;
+			margin-top: 30px;
+		}
+
+		.unselected p {
+			font-size: 7px;
+			margin-top: 2px;
+		}
+		
+		.unselected .title, .unselected img {
+			display: None;
+		}
+
+		.logo.moved {
+			position: absolute;
+			top: 20px;
+			left: 20px;
+			transition: all 1s ease-in-out;
+			cursor: pointer; /* Make the cursor a pointer */
+		}
+
+		footer {
+			position: absolute;
+			bottom: 5px;
+			width: 100%;
+			text-align: center;
+			color: #d5d4d4;
+			font-size: 16px;
+			margin: 0;
+			padding: 0;
+			margin-bottom: -5px;
+		}
+		/* Add these to your existing CSS */
+
+		.advertisement {
+			display: none;
+			/* margin-top: 20px; */
+			font-size: 18px;
+			text-align: center;
+			/* animation: fadeIn 2s ease-in-out; */
+			/* animation: rise 2s ease-in-out forwards; */
+		}
+
+		.advertisement .cards {
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 95px;
+			margin-top: 3%;
+		}
+
+		.advertisement .card {
+			color: #fff;
+			border: unset;
+			border-radius: 50%;
+			box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+			padding: 20px;
+			width: 240px;
+			height: 240px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			cursor: pointer;
+			transition: transform 0.3s, box-shadow 0.3s, width 1s ease-in-out, height 1s ease-in-out, font-size 1s ease-in-out, margin-top 1s ease-in-out;
+		}
+
+		.rise-bubble {
+			opacity: 0;
+			transform: translateY(100%);
+			animation: rise 0.8s ease-in-out forwards;
+		}
+
+		@keyframes rise {
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.advertisement .card:hover {
+			/* transform: translateY(-10px);
+			box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2); */
+			
+            transform: scale(1.25);
+		}
+
+		.advertisement .card h3 {
+			font-size: 22px;
+			margin: 10px 0;
+		}
+
+		.advertisement .card i {
+			font-size: 40px;
+			margin-bottom: 10px;
+			/* color: #1e1708; */
+		}
+
+		.content-section {
+			display: none;
+			text-align: center;
+			padding: 20px;
+			opacity: 0;
+			transition: transition 1s ease-in-out;
+		}
+
+		.content-section .back-button {
+			display: inline-block;
+			margin-top: 20px;
+			padding: 10px 20px;
+			background-color: #5594be;
+			color: #fff;
+			border-radius: 5px;
+			cursor: pointer;
+			text-decoration: none;
+		}
+
+		.content-section .back-button:hover {
+			background-color: #5594be;
+		}
+
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		.details {
+			display: none;
+			margin-top: 20px;
+			font-size: 18px;
+			line-height: 1.5;
+			text-align: center;
+			max-width: 800px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		.footer {
+			/* width: 100%; */
+			height: 2%;
+			text-align: center;
+			padding: 10px;
+			background-color: #333;
+			color: #fff;
+			font-size: 1em;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.footer-spinner-cube {
+			display: block;
+			margin: 0 auto;
+			width: 18px;
+			height: 18px;
+			perspective: 100px;
+			z-index: 1000;
+			position: relative;
+			font-weight: 700;
+		}
+
+		.footer-spinner-cube-inner {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			transform-style: preserve-3d;
+			animation: spin 1.5s infinite linear; /* Initial state */
+            /* transition: transform 5s ease-in-out; */
+		}
+
+		.footer-cube-face {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background: inherit;
+			display: flex;
+			align-items: center;
+			color: #d5cfcf;
+			justify-content: center;
+			font-size: xx-small;
+			border: 1px solid;
+		}
+
+		.footer-cube-face:nth-child(1) {
+			transform: translateZ(9px);
+		}
+		.footer-cube-face:nth-child(2) {
+			transform: rotateY(90deg) translateZ(9px);
+		}
+		.footer-cube-face:nth-child(3) {
+			transform: rotateY(180deg) translateZ(9px);
+		}
+		.footer-cube-face:nth-child(4) {
+			transform: rotateY(-90deg) translateZ(9px);
+		}
+		.footer-cube-face:nth-child(5) {
+			transform: rotateX(90deg) translateZ(9px);
+		}
+		.footer-cube-face:nth-child(6) {
+			transform: rotateX(-90deg) translateZ(9px);
+		}
+
+		.logo {
+			position: absolute;
+			top: 20px;
+			left: 20px;
+			transition: all 1s ease-in-out;
+			cursor: pointer;
+			margin: 1%;
+		}
+
+		.pre-landing {
+			width: 100%;
+			height: 100%;
+			display: flex;
+			/* justify-content: center; */
+			align-items: center;
+			color: #fff;
+			flex-direction: column;
+			transition: opacity 1s ease;
+        }
+
+        .pre-landing-cube {
+            width: 190px;
+            height: 190px;
+            position: absolute;
+            top: 56%;
+        }
+
+		.pre-landing-cube-inner {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+            transform-style: preserve-3d;
+            animation: rotateCube 7s infinite linear;
+		}
+
+        .pre-landing-cube-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 80px;
+        }
+
+        .pre-landing-cube-face:nth-child(1) { transform: translateZ(95px); }
+        .pre-landing-cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(95px); }
+        .pre-landing-cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(95px); }
+        .pre-landing-cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(95px); }
+        .pre-landing-cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(95px); }
+        .pre-landing-cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(95px); }
+
+        @keyframes rotateCube {
+            from { transform: rotateX(0deg) rotateY(0deg); }
+            to { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        .tap-overlay {
+			color: white;
+			font-size: 24px;
+			text-align: center;
+			cursor: pointer;
+			margin: auto;
+    		margin-top: 8%;
+        }
+
+        .tap-overlay i {
+            font-size: 100px; /* Adjust size as needed */
+            animation: pulse 1.5s infinite;
+            margin-bottom: 20px;
+			padding: 10%;
+			border: 3px solid #fff;
+			border-radius: 50%;
+			background-color: #1e8141;
+        }
+
+		@keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+		.user-persona-container .persona-initial {
+			display: none;
+		}
+
+		.user-persona-container.exp-selected {
+			/* transform: scale(0.6); */
+    		/* margin-top: -3%; */
+			align-items: center;
+		}
+
+		.user-persona-container.left {
+			flex-direction: column;
+		}
+
+		.left {
+			position: absolute;
+			top: 25%;
+			left: 1%;
+		}
+
+		.user-persona-container.exp-selected .unselected {
+			width: 50px;
+			height: 50px;
+			margin: 15px;
+		}
+
+		.user-persona-container.exp-selected .selected {
+			width: 20px;
+			height: 20px;
+			margin: 10px;
+		}
+
+		.user-persona-container.exp-selected img {
+			display: none;
+		}
+
+		.user-persona-container.exp-selected .title, 
+		.user-persona-container.exp-selected .persona-title {
+			display: none;
+		}
+
+		.user-persona-container.exp-selected .persona-initial {
+			display: block;
+			margin: 0;
+			font-size: larger;
+		}
+
+		.advertisement .cards.exp-selected {
+			transform: scale(0.9);
+			gap: 25px;
+			margin-top: 0;
+		}
+
+		.advertisement .cards.exp-selected .card.unselected {
+			width: 80px;
+			height: 80px;
+			margin-top: 0;
+		}
+
+		.advertisement .cards.exp-selected .card.selected {
+			width: 190px;
+			height: 190px;
+		}
+
+		.advertisement .card.unselected i,
+		.advertisement .card.selected i {
+			margin-bottom: 0;
+		}
+
+		.advertisement .card.unselected i {
+			display: none;
+		}
+
+		/* .advertisement .card.unselected h3,
+		.advertisement .card.selected h3 {
+			display: none;
+		} */
+
+		.advertisement .card.unselected .experience-heading {
+			font-size: small;
+		}
+
+		.experiences .experience {
+			display: none;
+		}
+
+		/* Resident Sentiment */
+		.resident-sentiment-challenge {
+			display: flex;
+			align-items: center;
+			gap: 100px;
+		}
+		.speech-bubble {
+            position: relative;
+            background-color: #00a4e4;
+            border-radius: 25px;
+            padding: 20px;
+            display: inline-block;
+            max-width: 600px;
+            text-align: left;
+			min-width: 600px;
+			min-height: 320px;
+        }
+
+		/* .speech-bubble::before {
+			content: '';
+			position: absolute;
+			width: 0;
+			height: 0;
+			border-top: 20px solid transparent;
+			border-bottom: 20px solid transparent;
+			border-right: 20px solid #00a4e4;
+			left: -20px;
+			top: 29%;
+			transform: translateY(-200%);
+		} */
+
+        .person-icon {
+            font-size: 48px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .question {
+			margin-top: 4%;
+        }
+        .person-details {
+            display: inline-block;
+            vertical-align: top;
+            font-size: 18px;
+        }
+        .person-name {
+            font-weight: bold;
+        }
+        .tap-here {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .tap-icon {
+			font-size: 5rem;
+            cursor: pointer;
+        }
+
+		.resident-sentiment-solution {
+			display: none;
+			flex-direction: column;
+			width: 100%;
+		}
+
+		/* steps container */
+		.steps-container {
+			display: flex;
+			align-items: center;
+			/* gap: 20px; */
+			position: relative;
+			justify-content: space-between;
+		}
+
+		.step {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			position: relative;
+			cursor: pointer;
+		}
+
+		.circle {
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			background-color: white;
+			color: #2a7a94;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-size: 16px;
+			font-weight: bold;
+			padding: 22px;
+		}
+
+		.label {
+			padding: 10px;
+			border-radius: 5px;
+		}
+
+		.step::after {
+			content: '';
+			width: 310px;
+			height: 2px;
+			background-color: white;
+			position: absolute;
+			top: 50%;
+			left: calc(100% + 1px);
+			transform: translateY(-50%);
+		}
+
+		.step:last-child::after {
+			display: none;
+		}
+
+		.step .label::before {
+			content: '';
+			width: 30px;
+			height: 2px;
+			background-color: white;
+			position: absolute;
+			top: 50%;
+			left: 25px;
+			transform: translateY(-50%);
+			z-index: -1;
+		}
+
+		.step.active .circle {
+			background-color: #4caf50;
+			color: white;
+		}
+
+		.step.active .label {
+			display: block;
+		}
+
+		.label {
+			display: none;
+		}
+
+		.step-content {
+			margin-top: 20px;
+		}
+
+		#step-display {
+			background-color: white;
+			color: #2a7a94;
+			padding: 20px;
+			border-radius: 5px;
+			max-width: 600px;
+			text-align: center;
+		}
+
+		.step-content .step-display {
+			display: none;
+		}
+		.step-content .step-display.active {
+			display: block;
+		}
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-color/2.1.2/jquery.color.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/annotations.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<script src="javascripts/sparkline.bundle.js"></script>
+	<script src="javascripts/easypiechart.bundle.js"></script>
+    <script src="javascripts/dashboard.js"></script>
+    <script>
+		let bubblesJSON = {
+			"resident": {
+				"heading": "A day in the life of...",
+				"personas": [{
+					"name": "Mary Ann",
+					"image": "resident.png",
+					"title": "Resident"
+				}],
+				"experiences": [{
+					"heading": "Menu Diversity & Personalization",
+					"content": "Details about the origin of dishes and various options available.",
+					"icon": "fa-globe"
+				}, {
+					"heading": "Resident Engagement",
+					"content": "Details about how we keep residents engaged through food-related activities.",
+					"icon": "fa-hands-helping"
+				}, {
+					"heading": "TBD",
+					"content": "Details about how we offer custom made dishes to suit individual preferences.",
+					"icon": "fa-info-circle"
+				}],
+				"experienceShadeType": "dark"
+			},
+			"restaura staff": {
+				"heading": "A day in the life of...",
+				"personas": [{
+					"name": "Robert Donovan",
+					"image": "chef.png",
+					"title": "Restaura Staff"
+				}],
+				"experiences": [{
+					"heading": "Employee Empowerement & Committment",
+					"content": "Details about the employee's journey and experience working at Restaura.",
+					"icon": "fa-handshake"
+				}, {
+					"heading": "Culinary Story",
+					"content": "Details about the culinary arts and how we bring the best dishes to the table.",
+					"icon": "fa-utensils"
+				}, {
+					"heading": "Supply Chain Story",
+					"content": "Details about the supply chain and how we source the freshest ingredients.",
+					"icon": "fa-truck"
+				}],
+				"experienceShadeType": "light"
+			},
+			"community executive": {
+				"heading": "A day in the life of...",
+				"personas": [{
+					"name": "John Silver",
+					"image": "ceo.png",
+					"title": "Community Executive"
+				}],
+				"experiences": [{
+					"heading": "Resident Sentiment",
+					"content": "Details about the resident sentiment and how we keep them happy.",
+					"icon": "fa-face-smile"
+				}, {
+					"heading": "Food & Labor Cost",
+					"content": "Details about the food and labor costs and how we manage them.",
+					"icon": "fa-dollar"
+				}, {
+					"heading": "New Aquisition Cost",
+					"content": "Details about the cost of new acquisitions and how we manage them.",
+					"icon": "fa-user-plus"
+				}],
+				"experienceShadeType": "light"
+			}
+		};
+		let selectedUserType = undefined;
+		const cssClassExpSelected = 'exp-selected';
+		const cssLeft = 'left';
+
+		function resetBodyBG() {
+			$('body').css('background', "url('./page-bg.png') no-repeat center center fixed");
+		}
+
+		resetExpCards = () => {
+			resetAllExperiences();
+			$('.advertisement .cards').removeClass(cssClassExpSelected);
+			$('.user-persona-container').removeClass(cssClassExpSelected);
+			$('.user-persona-container').removeClass(cssLeft);
+			$('.personas').removeClass(cssLeft);
+
+			$('.advertisement .cards .card').each(function() {
+				$(this).removeClass('selected unselected');
+				$(this).addClass('rise-bubble');
+				setTimeout(() => {
+					$(this).removeClass('rise-bubble');
+				}, 1500);
+			});
+		}
+
+        function showDetails(event, userType) {
+			const $bubblecontainer = $('.bubble-container');
+			const $heading = $('.heading');
+			const $personas = $('.personas');
+			const $userPersonaContainer = $('.user-persona-container');
+			const $advertisement = $('.advertisement');
+			const $contentSection = $('.content-section');
+			const $cards = $('.advertisement .cards');
+			const $spinner = $('#spinner-cube');
+			const $overlay = $('#overlay');
+			const $logo = $('.logo');
+			let bgColor = undefined;
+			
+			resetExpCards();
+			
+			$advertisement.css('display', 'none');
+			$contentSection.css('display', 'none');
+			$spinner.css('display', 'block');
+
+			// Animate heading to disappear
+			$heading.hide();
+
+			// Animate personas to the top and shrink
+			$personas.addClass('shrink');
+			$userPersonaContainer.children().each(function() {
+				const $persona = $(this);
+				if ($persona.find('.persona-title').text().toLowerCase() === userType.toLowerCase()) {
+					$persona.addClass('selected').removeClass('unselected');
+
+					// Change spinner cube color to match selected persona
+					const color = $persona.css('background');
+					$('.cube-face').css('background', color);
+					bgColor = color;
+				} else {
+					$persona.addClass('unselected').removeClass('selected');
+				}
+			});
+
+			setTimeout(() => {
+				$('body').css('background', bgColor);
+			}, 500);
+
+			setTimeout(() => {
+				$spinner.css('display', 'none');
+				let personaData = bubblesJSON[userType.toLowerCase()];
+				
+				let shadeFactor = 0.1;
+
+				let lighterColor = $.Color(bgColor).lightness('+=' + shadeFactor);
+				let darkerColor = $.Color(bgColor).lightness('-=' + shadeFactor);
+
+				$advertisement.css('display', 'block');
+				$('.advertisement .cards .card').each(function(index) {
+					let $card = $(this);
+					$(this).css('animation-delay', index * 0.3 + 's').addClass('rise-bubble');
+					
+					if (personaData.experienceShadeType === 'light') {
+						$(this).css('background', lighterColor);
+					} else {
+						$(this).css('background', darkerColor);
+					}
+
+					let experience = personaData.experiences[index];
+					$(this).find('.icon').attr('class', 'icon fa ' + experience.icon);
+					$(this).find('.experience-heading').text(experience.heading);
+					$(this).removeClass('selected unselected');
+
+					setTimeout(() => {
+						$card.removeClass('rise-bubble');
+					}, 1500);
+				});
+			}, 2500);
+		}
+
+		function goHome() {
+			const $heading = $('.heading');
+			const $personas = $('.personas');
+			const $userPersonaContainer = $('.user-persona-container');
+			const $details = $('.details');
+			const $advertisement = $('.advertisement');
+			const $logo = $('.logo');
+			const $contentSection = $('.content-section');
+
+			resetExpCards();
+
+			// Reset heading and personas
+			$heading.show();
+			$personas.removeClass('shrink');
+			$('body').css('background', "url('./page-bg.png') no-repeat center center fixed");
+			$userPersonaContainer.children().each(function() {
+				$(this).removeClass('selected unselected');
+			});
+
+			// Hide details, advertisement, and content section
+			$details.hide();
+			$advertisement.hide();
+			$contentSection.hide();
+		}
+
+		function goBack() {
+			const $advertisement = $('.advertisement');
+			const $contentSection = $('.content-section');
+			$contentSection.hide();
+			resetExpCards();
+		}
+
+		function typeText(element, text) {
+			new Typed(element, {
+				strings: [text],
+				typeSpeed: 30,
+				showCursor: false
+			});
+		}
+
+		function showResidentSentiment() {
+			$('.experiences .resident-sentiment').css('display', 'flex');
+			$('.experiences .resident-sentiment .challenge').css('display', 'flex');
+
+			let questionText = $('.experiences .resident-sentiment .question-text').text();
+			$('.experiences .resident-sentiment .question-text').text('');
+			typeText('.experiences .resident-sentiment .question-text', questionText);
+			// let questionText = 'How can Restaura help us gain a more in-depth, accurate, and timely sense of how our residents are feeling, what they\'re thinking, and how we might make them feel happier, more satisfied, and more fulfilled?';
+		}
+
+		resetAllExperiences = () => {
+			$('.experiences .experience').css('display', 'none');
+			$('.experiences .experience .solution').css('display', 'none');
+		}
+
+		function showContent(cardType) {
+			const $advertisement = $('.advertisement');
+			const $contentSection = $('.content-section');
+			
+			resetAllExperiences();
+
+			$contentSection.css('display', 'block');
+			$contentSection.css('opacity', '1');
+
+			console.log('cardType', cardType);
+
+			if(cardType == 'Resident Sentiment') {
+				showResidentSentiment();
+			}
+
+			// $contentSection.html(`<div style="font-size:50px;">${content}</div><a class="back-button" onclick="goBack()">Back</a>`).css('display', 'block');
+		}
+
+		$(document).ready(() => {
+			$('.user-persona').on('click', function(event) {
+				const userType = $(event.currentTarget).find('.persona-title').text();
+				selectedUserType = userType;
+				showDetails(event, userType);
+			});
+
+			$('.advertisement .cards .card').on('click', function(event) {
+				const cardType = $(event.currentTarget).find('h3').text();
+				const expHeading = $(event.currentTarget).find('.experience-heading').text();
+				const $cards = $('.advertisement .cards');
+				const $spinner = $('#spinner-cube');
+				let bgColor = undefined;
+				
+				$spinner.css('display', 'block');
+
+				$('.user-persona-container').addClass(cssClassExpSelected);
+				$('.user-persona-container').addClass(cssLeft);
+				$('.personas').addClass(cssLeft);
+				$cards.addClass(cssClassExpSelected);
+
+				$cards.children().each(function() {
+					$(this).removeClass('rise-bubble');
+					if ($(this).find('.experience-heading').text() === expHeading) {
+						$(this).addClass('selected').removeClass('unselected');
+						bgColor = $(this).css('background');
+						$('.cube-face').css('background', bgColor);
+					} else {
+						$(this).addClass('unselected').removeClass('selected');
+					}
+				});
+
+				setTimeout(() => {
+					$spinner.css('display', 'none');
+					showContent(cardType);
+				}, 2000);
+			});
+
+			$('.back-button').on('click', goBack);
+			
+			$('.pre-landing .tap-overlay').on('click', function() {
+				$('.pre-landing-cube').css({'animation': 'shrink-and-fade 2.5s forwards'});
+				const $bubblecontainer = $('.bubble-container');
+				$bubblecontainer.css('display', 'flex');
+                setTimeout(() => {
+                    $(this).hide();
+					$('.pre-landing-cube').css('display', 'none');
+					$('.pre-landing').css('opacity', '0');
+                    $('.personas').addClass('show');
+                    $('.user-persona').each(function(index) {
+                        $(this).delay(index * 500).queue(function(next) {
+                            $(this).addClass('show');
+                            next();
+                        });
+                    });
+                }, 1000); // Adjust the delay to match the transition duration
+            });
+
+			$('.resident-sentiment-challenge .tap-overlay').on('click', function() {
+				$this = $(this);
+				const $spinner = $('#spinner-cube');
+				$('.resident-sentiment-challenge .speech-bubble')
+				.addClass('animate__animated animate__bounceOut')
+				.one('animationend', function() {
+				});
+
+				$this.addClass('animate__animated animate__bounceOutDown')
+				.one('animationend', function() {
+					$spinner.css('display', 'block');
+					$('.resident-sentiment-challenge').hide();
+					$('.resident-sentiment-challenge .speech-bubble').removeClass('animate__bounceOut');
+					$this.removeClass('animate__bounceOutDown');
+
+					setTimeout(() => {
+						$spinner.css('display', 'none');
+						$('.resident-sentiment-solution').css('display', 'flex');
+						$('.resident-sentiment-solution .step').first().addClass('active');
+						let activeStepContentId = $('.step.active').data('step');
+						$('#' + activeStepContentId).addClass('active');
+						
+						$('.dashboard').show();
+						$('.dashboard').addClass('animate__animated animate__rollIn');
+						
+						resetDashboard();
+						setTimeout(() => {
+							initializeDashboard();
+						}, 1000);
+    					// $('.resident-sentiment-solution #step-display').text($('.step.active').data('step'));
+					}, 2000);
+				});
+			});
+
+			$('.resident-sentiment-solution .step').click(function() {
+				$('.resident-sentiment-solution .step').removeClass('active');
+				$(this).addClass('active');
+				$('.step-content .step-display').removeClass('active');
+				let activeStepContentId = $('.step.active').data('step');
+				$('#' + activeStepContentId).addClass('active');
+
+				$('.resident-sentiment-solution #step-display').addClass('animate__animated animate__slideInDown')
+				.one('animationend', function() {
+					$(this).removeClass('animate__slideInDown').text($('.step.active').data('step')).addClass('animate__slideInUp')
+					.one('animationend', function() {
+						$(this).removeClass('animate__slideInUp animate__animated');
+					});
+				});
+			});
+			
+		});
+    </script>
+</head>
+<body>
+	<div class="logo" onclick="goHome()">
+		<img src="./restura-logo.png" alt="restura-logo">
+	</div>
+	<div class="page-content">
+		<div class="pre-landing">
+			<div class="tap-overlay">
+				<i class="fas fa-hand-pointer"></i>
+				<div>Tap Here to Start</div>
+			</div>
+			<div class="pre-landing-cube">
+				<div class="pre-landing-cube-inner">
+					<div class="pre-landing-cube-face">i</div>
+					<div class="pre-landing-cube-face">i</div>
+					<div class="pre-landing-cube-face">i</div>
+					<div class="pre-landing-cube-face">i</div>
+					<div class="pre-landing-cube-face">i</div>
+					<div class="pre-landing-cube-face">i</div>
+				</div>
+			</div>
+		</div>
+		<div class="bubble-container" style="margin-top: 10px;">
+			<div class="personas">
+				<div class="heading">
+					<div>A day in the life of...</div>
+				</div>
+				<div class="user-persona-container">
+					<div class="user-persona c-level">
+						<p class="title m-0">John Silver</p>
+						<img src="ceo.png" alt="C Level Executives" class="my-2">
+						<p class="persona-title mb-2">Community Executive</p>
+						<p class="persona-initial">CE</p>
+					</div>
+					<div class="user-persona resident">
+						<p class="title m-0">Mary Ann</p>
+						<img src="resident.png" alt="Resident" class="my-2">
+						<p class="persona-title mb-2">Resident</p>
+						<p class="persona-initial">R</p>
+					</div>
+					<div class="user-persona restaura">
+						<p class="title m-0">Robert Donovan</p>
+						<img src="chef.png" alt="C Level Executives" class="my-2">
+						<p class="persona-title mb-2">Restaura Staff</p>
+						<p class="persona-initial">RS</p>
+					</div>
+				</div>
+			</div>
+			<div class="details"></div>
+			<div class="advertisement">
+				<!-- <h2>What would you like to dive in ?</h2> -->
+				<div class="cards">
+					<div class="card rise-bubble">
+						<i class="fa icon"></i>
+						<h3 class="experience-heading"></h3>
+					</div>
+					<div class="card rise-bubble">
+						<i class="fa icon"></i>
+						<h3 class="experience-heading"></h3>
+					</div>
+					<div class="card rise-bubble">
+						<i class="fa icon"></i>
+						<h3 class="experience-heading"></h3>
+					</div>
+				</div>
+			</div>
+			<div class="content-section">
+				<div class="experiences">
+					<div class="experience resident-sentiment">
+						<div class="challenge resident-sentiment-challenge">
+							<div class="speech-bubble animate__animated animate__bounceIn animate__slow">
+								<i class="fas fa-user-circle person-icon"></i>
+								<div class="person-details">
+									<div class="person-name">John Silver</div>
+									<div class="person-designation">Community Executive</div>
+								</div>
+								<div class="question">
+									<h2 class="question-text">How can Restaura help us gain a more in-depth, accurate, and timely sense of how our residents are feeling, what they're thinking, and how we might make them feel happier, more satisfied, and more fulfilled?</h2>
+								</div>
+							</div>
+							<div class="fs-1 tap-overlay animate__animated animate__bounceInUp animate__delay-2s animate__slow">
+								<i class="fas fa-hand-pointer tap-icon animate__animated animate__pulse animate__infinite"></i>
+								<p>Tap here to find out</p>
+							</div>
+						</div>
+						<div class="solution resident-sentiment-solution animate__animated animate__zoomIn">
+							<div class="steps-container">
+								<div class="step" data-step="step-display-1">
+									<div class="circle">1</div>
+									<div class="label">We collect & visualize sentiment data across different aspects</div>
+								</div>
+								<div class="step" data-step="step-display-2">
+									<div class="circle">2</div>
+									<div class="label">Our AI powered insights help you derive deeper meaning</div>
+								</div>
+								<div class="step" data-step="step-display-3">
+									<div class="circle">3</div>
+									<div class="label">We generate actions that allow you to address sentiment feedback</div>
+								</div>
+							</div>
+							<div class="step-content">
+								<div id="step-display-1" class="step-display step1">
+									<div id="dashboard" class="dashboard">
+										<div class="row">
+											<div class="col-8 mb-4">
+												<div class="card">
+													<div class="card-body">
+														<div id="sentimentChart"></div>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-4 mb-4 gauge-venue">
+												<div class="card">
+													<div class="card-body">
+														<h5 class="card-title">Overall Score</h5>
+														<!-- <div id="scoreGauge"></div> -->
+														<!-- <canvas id="gauge-chart"></canvas> -->
+														<!-- <div id="overall-score" class="panel" data-panel-title="Overall Score">
+															<div id="gauge-chart"></div>
+														</div> -->
+														<div id="gauge-chart"></div>
+													</div>
+												</div>
+												<div class="card">
+													<div class="card-body">
+														<h5 class="card-title">Score By Venue</h5>
+														<div class="venue-scores"></div>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-12">
+												<div class="card">
+													<div class="card-body pb-2 pt-2">
+														<div class="row metrics">
+															<div class="col-3 p-1" style="border-right: 2px solid;">
+																<div class="metric" id="foodMetric"></div>
+															</div>
+															<div class="col-3 p-1" style="border-right: 2px solid;">
+																<div class="metric" id="serviceMetric"></div>
+															</div>
+															<div class="col-3 p-1" style="border-right: 2px solid;">
+																<div class="metric" id="envMetric"></div>
+															</div>
+															<div class="col-3 p-1">
+																<div class="metric" id="brandMetric"></div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div id="step-display-2" class="step-display step2">
+									<div id="key-insights" class="key-insights">
+										<div class="row">
+											<div class="col-md-12 col-xs-12">
+												<div class="fs-md" style="display: flex; justify-content: space-between; flex-direction: row;">
+												   <div>
+													  <div class="fs-xl">
+														 <span>While the food and service categories are performing relatively well, there is significant room for improvement in the environment and restaura brand categories, which have lower scores. 
+														 Prioritizing enhancements in the dining environment and restaura brand perception could substantially elevate the overall sentiment and create a more balanced and satisfying experience for the residents.</span>
+														 <ul class="mt-3">
+															<li>Food and service categories are performing relatively well.</li>
+															<li>Environment and restaura brand categories have lower scores.</li>
+															<li>Prioritize improvements in the dining environment.</li>
+															<li>Focus on enhancing restaura brand perception.</li>
+															<li>Elevating these areas can significantly improve overall sentiment.</li>
+															<li>Aim for a more balanced and satisfying experience for residents.</li>
+														 </ul>
+													  </div>
+												   </div>
+												</div>
+											 </div>
+											 <div class="my-3"><button class="btn btn-primary w-25" fdprocessedid="1kfcxs">Collapse<i class="fal float-right fa-minus"></i></button></div>
+											 <div class="col-md-3 col-xl-3 col-xs-12 column">
+												<div class="p-3" style="background-color: rgb(176, 11, 234);">
+												   <h2><i class="fa-utensils-alt fal fs-5 mr-2"></i>Food</h2>
+												</div>
+												<div class="fs-md">
+												   <div class="card keyinsight-card my-2 pt-1">
+													  <div class="card-strip" style="background-color: rgb(255, 235, 59);"></div>
+													  <div class="align-content-center d-flex justify-content-between my-2">
+														 <h3 class="">Score: 60%</h3>
+														 <p><i class="fa fa-user-circle-o"></i> 148 Responses</p>
+													  </div>
+													  <div class="">The food is highly valued for its quality ingredients but lacks consistency in preparation.</div>
+													  <div class="mt-2">
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> High appreciation for freshness and quality of ingredients</div>
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Positive feedback on locally sourced and scratch-prepared ingredients</div>
+														 <div class="p-1 dashboard-category-insight-points-negative"> <i class="fa fa-times"></i> Significant inconsistencies in preparation</div>
+														 <div class="p-1 dashboard-category-insight-points-negative"> <i class="fa fa-times"></i> Issues with seasoning and temperature</div>
+														 <div class="p-1 dashboard-category-insight-points-neutral"> <i class="fa fa-info-circle"></i> Need for greater attention to uniformity and detail</div>
+													  </div>
+												   </div>
+												</div>
+												<div class="text-center mb-3 p-0"><button class="btn btn-outline-primary w-100" fdprocessedid="1qybvp">Expand<i class="fal float-right fa-plus"></i></button></div>
+											 </div>
+											 <div class="col-md-3 col-xl-3 col-xs-12 column">
+												<div class="p-3" style="background-color: rgb(252, 44, 92);">
+												   <h2><i class="fa-concierge-bell fal fs-5 mr-2"></i>Service</h2>
+												</div>
+												<div class="fs-md">
+												   <div class="card keyinsight-card my-2 pt-1">
+													  <div class="card-strip" style="background-color: rgb(255, 235, 59);"></div>
+													  <div class="align-content-center d-flex justify-content-between my-2">
+														 <h3 class="">Score: 55%</h3>
+														 <p><i class="fa fa-user-circle-o"></i> 165 Responses</p>
+													  </div>
+													  <div class="">Service performance is mixed, with notable issues in responsiveness and waiting times.</div>
+													  <div class="mt-2">
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Knowledge and appearance are the strongest areas</div>
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Staff demonstrates good understanding of menu details</div>
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Professional appearance is maintained</div>
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Strong rapport and trust among residents</div>
+														 <div class="p-1 dashboard-category-insight-points-negative"> <i class="fa fa-times"></i> Helpfulness and attentiveness are problematic</div>
+														 <a class="btn btn-link p-0 toggle-link">&nbsp; more</a>
+													  </div>
+												   </div>
+												</div>
+												<div class="text-center mb-3 p-0"><button class="btn btn-outline-primary w-100" fdprocessedid="wcv3z">Expand<i class="fal float-right fa-plus"></i></button></div>
+											 </div>
+											 <div class="col-md-3 col-xl-3 col-xs-12 column">
+												<div class="p-3" style="background-color: rgb(82, 191, 17);">
+												   <h2><i class="fa-building fal fs-5 mr-2"></i>Environment</h2>
+												</div>
+												<div class="fs-md">
+												   <div class="card keyinsight-card my-2 pt-1">
+													  <div class="card-strip" style="background-color: rgb(255, 235, 59);"></div>
+													  <div class="align-content-center d-flex justify-content-between my-2">
+														 <h3 class="">Score: 54%</h3>
+														 <p><i class="fa fa-user-circle-o"></i> 150 Responses</p>
+													  </div>
+													  <div class="">The environment category has strong points in design and cleanliness but reveals critical areas needing improvement.</div>
+													  <div class="mt-2">
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Appreciation for aesthetic design cohesion and well-maintained landscaping</div>
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Positive feedback on dining area cleanliness and staff hygiene</div>
+														 <div class="p-1 dashboard-category-insight-points-negative"> <i class="fa fa-times"></i> Significant concerns about the condition of furniture</div>
+														 <div class="p-1 dashboard-category-insight-points-negative"> <i class="fa fa-times"></i> Inadequate refresh rates for décor and ambiance</div>
+														 <div class="p-1 dashboard-category-insight-points-negative"> <i class="fa fa-times"></i> Inconsistent temperature control</div>
+														 <a class="btn btn-link p-0 toggle-link">&nbsp; more</a>
+													  </div>
+												   </div>
+												</div>
+												<div class="text-center mb-3 p-0"><button class="btn btn-outline-primary w-100" fdprocessedid="gnklwe">Expand<i class="fal float-right fa-plus"></i></button></div>
+											 </div>
+											 <div class="col-md-3 col-xl-3 col-xs-12 column">
+												<div class="p-3" style="background-color: rgb(234, 164, 50);">
+												   <h2><i class="fa-handshake fal fs-5 mr-2"></i>Restaura Brand</h2>
+												</div>
+												<div class="fs-md">
+												   <div class="card keyinsight-card my-2 pt-1">
+													  <div class="card-strip" style="background-color: rgb(139, 195, 74);"></div>
+													  <div class="align-content-center d-flex justify-content-between my-2">
+														 <h3 class="">Score: 63%</h3>
+														 <p><i class="fa fa-user-circle-o"></i> 152 Responses</p>
+													  </div>
+													  <div class="">Residents have a positive perception of dining services but highlight the need for consistency and visible environmental initiatives.</div>
+													  <div class="mt-2">
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Appreciation for the freshness of ingredients and culinary creativity</div>
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Positive reception of fair labor and local sourcing practices</div>
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Strong ethical perception</div>
+														 <div class="p-1 dashboard-category-insight-points-positive"> <i class="fa fa-check"></i> Praise for sustainability efforts and innovation</div>
+														 <div class="p-1 dashboard-category-insight-points-negative"> <i class="fa fa-times"></i> Concerns about consistency in meal quality</div>
+														 <a class="btn btn-link p-0 toggle-link">&nbsp; more</a>
+													  </div>
+												   </div>
+												</div>
+												<div class="text-center mb-3 p-0"><button class="btn btn-outline-primary w-100" fdprocessedid="t4crd9">Expand<i class="fal float-right fa-plus"></i></button></div>
+											 </div>							  
+										</div>
+									</div>
+								</div>
+								<div id="step-display-3" class="step-display step3">
+									<div id="action-items" class="action-items">
+										<div class="row">
+											<div class="col-8 mb-4">
+												<div class="card">
+													<div class="card-body">
+														<div id="sentimentChart"></div>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-4 mb-4 gauge-venue">
+												<div class="card">
+													<div class="card-body">
+														<h5 class="card-title">Overall Score</h5>
+														<!-- <div id="scoreGauge"></div> -->
+														<!-- <canvas id="gauge-chart"></canvas> -->
+														<!-- <div id="overall-score" class="panel" data-panel-title="Overall Score">
+															<div id="gauge-chart"></div>
+														</div> -->
+														<div id="gauge-chart"></div>
+													</div>
+												</div>
+												<div class="card">
+													<div class="card-body">
+														<h5 class="card-title">Score By Venue</h5>
+														<div class="venue-scores"></div>
+													</div>
+												</div>
+											</div>
+											<div class="col-md-12">
+												<div class="card">
+													<div class="card-body pb-2 pt-2">
+														<div class="row metrics">
+															<div class="col-3 p-1" style="border-right: 2px solid;">
+																<div class="metric" id="foodMetric"></div>
+															</div>
+															<div class="col-3 p-1" style="border-right: 2px solid;">
+																<div class="metric" id="serviceMetric"></div>
+															</div>
+															<div class="col-3 p-1" style="border-right: 2px solid;">
+																<div class="metric" id="envMetric"></div>
+															</div>
+															<div class="col-3 p-1">
+																<div class="metric" id="brandMetric"></div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="experience food-labor-cost">
+						<h2>Food & Labor Cost</h2>
+						<p>Details about the food & labor cost. Coming soon...</p>
+					</div>
+					<div class="experience new-resident-acquisition">
+						<h2>New Resident Acquisition</h2>
+						<p>Details about the new resident acquisition. Coming soon...</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div id="spinner-cube" class="spinner-cube">
+			<div class="spinner-cube-inner">
+				<div class="cube-face">i</div>
+				<div class="cube-face">i</div>
+				<div class="cube-face">i</div>
+				<div class="cube-face">i</div>
+				<div class="cube-face">i</div>
+				<div class="cube-face">i</div>
+			</div>
+		</div>
+		<div id="overlay" class="overlay">
+			<div id="overlay-content" class="overlay-content">
+				<div id="spinner-cube" class="spinner-cube">
+					<div class="spinner-cube-inner">
+						<div class="cube-face">i</div>
+						<div class="cube-face">i</div>
+						<div class="cube-face">i</div>
+						<div class="cube-face">i</div>
+						<div class="cube-face">i</div>
+						<div class="cube-face">i</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="footer">
+		<div style="display: flex;">
+			<span style="margin-left: 10px;">i³ Inside</span>
+		</div>
+	</div>
+</body>
+</html>

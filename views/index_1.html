@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaura I³</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+	
+	<link href='https://fonts.googleapis.com/css?family=Acme' rel='stylesheet'>
+    <style>
+		:root {
+			--c-level-bg: #143E57;
+			--resident-bg: #EAA432;
+			--restaura-bg: #E65032;
+		}
+
+        body {
+            font-family: 'Acme';
+            text-align: center;
+            background: url('./page-bg.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+			transition: background-color 1s ease-in-out;
+			margin: 0;
+			overflow: hidden;
+        }
+		
+        .bubble-container {
+            margin: 5px auto;
+            width: 80%;
+            transition: transform 1s ease-in-out;
+        }
+		
+        .heading {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #fff;
+            transition: opacity 0.5s ease-in-out;
+        }
+		
+		.heading h2 {
+            margin-bottom: 5px;
+		}
+
+		.personas {
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			margin-bottom: 0; /* Removed margin */
+
+            opacity: 0;
+            transform: scale(0.8);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+			/* transition: transform 1s ease-in-out, margin-top 1s ease-in-out; */
+		}
+
+		.personas.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+		.personas.shrink {
+			margin-bottom: 0; /* Ensure no margin when shrinking */
+		}
+
+		.user-persona-container {
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			margin-bottom: 0; /* Removed margin */
+            transform: scale(0.8);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+		}
+		
+		.user-persona {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+            padding: 20px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            position: relative;
+            opacity: 0;
+            transform: scale(0);
+            transition: transform 0.3s, box-shadow 0.3s, width 1s ease-in-out, height 1s ease-in-out, font-size 1s ease-in-out, margin-top 1s ease-in-out;
+        }
+
+		.user-persona.show {
+			opacity: 1;
+			transform: scale(1);
+		}
+
+        /* .user-persona:nth-child(1) {
+            animation: loadPersona 0.5s ease-in-out forwards 0.2s;
+        }
+
+        .user-persona:nth-child(2) {
+            animation: loadPersona 0.5s ease-in-out forwards 0.4s;
+        }
+
+        .user-persona:nth-child(3) {
+            animation: loadPersona 0.5s ease-in-out forwards 0.6s;
+        }
+
+        @keyframes loadPersona {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        } */
+		
+		.user-persona:hover {
+            transform: scale(1.25);
+        }
+		
+		.user-persona img {
+		    width: 100%;
+			height: 50%;
+			border-radius: 50%;
+		}
+		
+		.user-persona .title {
+			font-size: 22px;
+			margin-bottom: 10px;
+			margin-top: 10px;
+		}
+		
+		.user-persona .persona-title {
+			font-size: 13px;
+		}
+		
+        .user-persona i {
+            font-size: 48px;
+            color: #fff;
+        }
+		
+        .user-persona p {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            transition: font-size 1s ease-in-out;
+        }
+
+        .c-level {
+            /* background: linear-gradient(135deg, #1d2b64 0%, #f8cdda 100%); */
+			/* background: #1d2b64; */
+			background: var(--c-level-bg);
+        }
+        .resident {
+            /* //background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); */
+			/* background: #0072ff; */
+			background: var(--resident-bg);
+        }
+        .restaura {
+            /* //background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); */
+			/* background: #ff4b2b; */
+			background: var(--restaura-bg);
+        }
+		
+		.spinner-cube {
+			display: none;
+			margin: 0 auto;
+			width: 200px;
+			height: 200px;
+			perspective: 400px;
+			margin-top: 2%;
+			z-index: 1000;
+			/* position: relative; */
+			font-weight: 700;
+			position: absolute;
+    		top: 85%;
+			opacity: 0;
+			animation: shrink-and-fade 2.5s infinite linear;
+		}
+
+		.spinner-cube-inner {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			transform-style: preserve-3d;
+			animation: spin 2s infinite linear;
+		}
+
+		.cube-face {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background: inherit;
+			display: flex;
+			align-items: center;
+			color: #d5cfcf;
+			justify-content: center;
+			font-size: xx-large;
+			font-weight: 900;
+			border: 3px solid;
+		}
+
+		.cube-face:nth-child(1) { transform: translateZ(100px); }
+		.cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(100px); }
+		.cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(100px); }
+		.cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(100px); }
+		.cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(100px); }
+		.cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(100px); }
+
+		@keyframes spin {
+			0% { transform: rotateX(0deg) rotateY(0deg); }
+			100% { transform: rotateX(360deg) rotateY(360deg); }
+		}
+
+		@keyframes shrink-and-fade {
+			0% { 
+				transform: scale(1.2);
+				opacity: 1;
+			}
+			
+			50% { 
+				transform: scale(0.7);
+				opacity: 0.5;
+			}
+
+			100% { 
+				transform: scale(0);
+				opacity: 0;
+			}
+		}
+
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+            color: #fff;
+        }
+        .overlay-content {
+            text-align: center;
+        }
+        .overlay-content h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .overlay-content p {
+            font-size: 18px;
+        }
+        .home-button {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #0072ff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .home-button:hover {
+            background-color: #005bb5;
+        }
+		
+		.selected {
+			width: 150px;
+			height: 150px;
+			border: 2px solid;
+			box-shadow: 0 32px 32px rgba(0, 0, 0, 0.2);
+			padding: 40px;
+		}
+		
+		.selected .title {
+			font-size: 14px;
+			margin-bottom: 5px;
+			margin-top: 1px;
+		}
+		
+		.selected .persona-title {
+			margin-top: 1px;
+			margin-bottom: 5px;
+		}
+
+		.unselected {
+			width: 50px;
+			height: 50px;
+			margin-top: 30px;
+		}
+
+		.unselected p {
+			font-size: 7px;
+			margin-top: 2px;
+		}
+		
+		.unselected .title, .unselected img {
+			display: None;
+		}
+
+		.logo.moved {
+			position: absolute;
+			top: 20px;
+			left: 20px;
+			transition: all 1s ease-in-out;
+			cursor: pointer; /* Make the cursor a pointer */
+		}
+
+		footer {
+			position: absolute;
+			bottom: 5px;
+			width: 100%;
+			text-align: center;
+			color: #d5d4d4;
+			font-size: 16px;
+			margin: 0;
+			padding: 0;
+			margin-bottom: -5px;
+		}
+		/* Add these to your existing CSS */
+
+		.advertisement {
+			display: none;
+			margin-top: 20px;
+			font-size: 18px;
+			text-align: center;
+			/* animation: fadeIn 2s ease-in-out; */
+			/* animation: rise 2s ease-in-out forwards; */
+		}
+
+		.advertisement .cards {
+			display: flex;
+			justify-content: center;
+			flex-wrap: wrap;
+			gap: 95px;
+		}
+
+		.advertisement .card {
+			/* background: linear-gradient(135deg, #6e8efb, #a777e3); */
+			color: #fff;
+			border-radius: 50%;
+			box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+			padding: 20px;
+			width: 200px;
+			height: 200px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			/* transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; */
+			/* animation: rise 2s ease-in-out forwards; */
+			opacity: 0;
+			transform: translateY(100%);
+			cursor: pointer;
+		}
+
+		.rise-bubble {
+			animation: rise 1s ease-in-out forwards;
+		}
+
+		@keyframes rise {
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.advertisement .card:hover {
+			transform: translateY(-10px);
+			box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+		}
+
+		.advertisement .card h3 {
+			font-size: 22px;
+			margin: 10px 0;
+		}
+
+		.advertisement .card i {
+			font-size: 40px;
+			margin-bottom: 10px;
+			/* color: #1e1708; */
+		}
+
+		.content-section {
+			display: none;
+			margin-top: 20px;
+			text-align: center;
+			padding: 20px;
+		}
+
+		.content-section .back-button {
+			display: inline-block;
+			margin-top: 20px;
+			padding: 10px 20px;
+			background-color: #5594be;
+			color: #fff;
+			border-radius: 5px;
+			cursor: pointer;
+			text-decoration: none;
+		}
+
+		.content-section .back-button:hover {
+			background-color: #5594be;
+		}
+
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		.details {
+			display: none;
+			margin-top: 20px;
+			font-size: 18px;
+			line-height: 1.5;
+			text-align: center;
+			max-width: 800px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		.footer {
+			width: 100%;
+			height: 2%;
+			text-align: center;
+			padding: 10px;
+			background-color: #333;
+			color: #fff;
+			font-size: 1em;
+			position: absolute;
+			bottom: -0.2%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.footer-spinner-cube {
+			display: block;
+			margin: 0 auto;
+			width: 18px;
+			height: 18px;
+			perspective: 100px;
+			z-index: 1000;
+			position: relative;
+			font-weight: 700;
+		}
+
+		.footer-spinner-cube-inner {
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			transform-style: preserve-3d;
+			animation: spin 1.5s infinite linear; /* Initial state */
+            /* transition: transform 5s ease-in-out; */
+		}
+
+		.footer-cube-face {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background: inherit;
+			display: flex;
+			align-items: center;
+			color: #d5cfcf;
+			justify-content: center;
+			font-size: xx-small;
+			border: 1px solid;
+		}
+
+		.footer-cube-face:nth-child(1) {
+			transform: translateZ(9px);
+		}
+		.footer-cube-face:nth-child(2) {
+			transform: rotateY(90deg) translateZ(9px);
+		}
+		.footer-cube-face:nth-child(3) {
+			transform: rotateY(180deg) translateZ(9px);
+		}
+		.footer-cube-face:nth-child(4) {
+			transform: rotateY(-90deg) translateZ(9px);
+		}
+		.footer-cube-face:nth-child(5) {
+			transform: rotateX(90deg) translateZ(9px);
+		}
+		.footer-cube-face:nth-child(6) {
+			transform: rotateX(-90deg) translateZ(9px);
+		}
+
+		.logo {
+			/* margin-top: 2.5%;
+			margin-bottom: 3%;
+			margin-left: 2%;
+			align-items: start;
+			display: flex; */
+			position: absolute;
+			top: 20px;
+			left: 20px;
+			transition: all 1s ease-in-out;
+			cursor: pointer;
+			margin: 1%;
+		}
+
+		.pre-landing {
+            /* position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            color: #fff;
+            flex-direction: column;
+            transition: opacity 1s ease; */
+			width: 100%;
+			height: 100%;
+			display: flex;
+			/* justify-content: center; */
+			align-items: center;
+			color: #fff;
+			flex-direction: column;
+			transition: opacity 1s ease;
+        }
+
+        .pre-landing-cube {
+            width: 190px;
+            height: 190px;
+            position: absolute;
+            top: 58%;
+            transform-style: preserve-3d;
+            animation: rotateCube 7s infinite linear;
+        }
+
+        .pre-landing-cube-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 80px;
+        }
+
+        .pre-landing-cube-face:nth-child(1) { transform: translateZ(95px); }
+        .pre-landing-cube-face:nth-child(2) { transform: rotateY(90deg) translateZ(95px); }
+        .pre-landing-cube-face:nth-child(3) { transform: rotateY(180deg) translateZ(95px); }
+        .pre-landing-cube-face:nth-child(4) { transform: rotateY(-90deg) translateZ(95px); }
+        .pre-landing-cube-face:nth-child(5) { transform: rotateX(90deg) translateZ(95px); }
+        .pre-landing-cube-face:nth-child(6) { transform: rotateX(-90deg) translateZ(95px); }
+
+        @keyframes rotateCube {
+            from { transform: rotateX(0deg) rotateY(0deg); }
+            to { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        .tap-overlay {
+            /* position: absolute;
+            top: -18%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            cursor: pointer;
+            flex-direction: column; */
+			color: white;
+			font-size: 24px;
+			text-align: center;
+			cursor: pointer;
+			margin: auto;
+    		margin-top: 10%;
+        }
+
+        .tap-overlay i {
+            font-size: 100px; /* Adjust size as needed */
+            animation: pulse 1.5s infinite;
+            margin-bottom: 20px;
+			padding: 10%;
+			border: 3px solid #fff;
+			border-radius: 50%;
+			background-color: #1e8141;
+        }
+
+		@keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-color/2.1.2/jquery.color.min.js"></script>
+    <script>
+		let bubblesJSON = {
+			"resident": {
+				"heading": "A day in the life of...",
+				"personas": [{
+					"name": "Mary Ann",
+					"image": "resident.png",
+					"title": "Resident"
+				}],
+				"experiences": [{
+					"heading": "Menu Diversity",
+					"content": "Details about the origin of dishes and various options available.",
+					"icon": "fa-globe"
+				}, {
+					"heading": "Engagement",
+					"content": "Details about how we keep residents engaged through food-related activities.",
+					"icon": "fa-hands-helping"
+				}, {
+					"heading": "Personalization",
+					"content": "Details about how we offer custom made dishes to suit individual preferences.",
+					"icon": "fa-user-cog"
+				}],
+				"experienceShadeType": "dark"
+			},
+			"restaura staff": {
+				"heading": "A day in the life of...",
+				"personas": [{
+					"name": "Robert Donovan",
+					"image": "chef.png",
+					"title": "Restaura Staff"
+				}],
+				"experiences": [{
+					"heading": "Employee Story",
+					"content": "Details about the employee's journey and experience working at Restaura.",
+					"icon": "fa-user"
+				}, {
+					"heading": "Culinary Story",
+					"content": "Details about the culinary arts and how we bring the best dishes to the table.",
+					"icon": "fa-utensils"
+				}, {
+					"heading": "Supply Chain Story",
+					"content": "Details about the supply chain and how we source the freshest ingredients.",
+					"icon": "fa-truck"
+				}],
+				"experienceShadeType": "light"
+			},
+			"community executive": {
+				"heading": "A day in the life of...",
+				"personas": [{
+					"name": "John Silver",
+					"image": "ceo.png",
+					"title": "Community Executive"
+				}],
+				"experiences": [{
+					"heading": "Resident Sentiment",
+					"content": "Details about the resident sentiment and how we keep them happy.",
+					"icon": "fa-face-smile"
+				}, {
+					"heading": "Food & Labor Cost",
+					"content": "Details about the food and labor costs and how we manage them.",
+					"icon": "fa-dollar"
+				}, {
+					"heading": "New Aquisition Cost",
+					"content": "Details about the cost of new acquisitions and how we manage them.",
+					"icon": "fa-user-plus"
+				}],
+				"experienceShadeType": "light"
+			}
+		};
+
+		function resetBodyBG() {
+			$('body').css('background', "url('./page-bg.png') no-repeat center center fixed");
+		}
+
+		function adjustColor(color, amount) {
+            let usePound = false;
+
+            if (color[0] == "#") {
+                color = color.slice(1);
+                usePound = true;
+            }
+
+            let num = parseInt(color, 16);
+
+            let r = (num >> 16) + amount;
+
+            if (r > 255) r = 255;
+            else if (r < 0) r = 0;
+
+            let g = ((num >> 8) & 0x00FF) + amount;
+
+            if (g > 255) g = 255;
+            else if (g < 0) g = 0;
+
+            let b = (num & 0x0000FF) + amount;
+
+            if (b > 255) b = 255;
+            else if (b < 0) b = 0;
+
+            return (usePound ? "#" : "") + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+        }
+
+        function showDetails(event, userType) {
+			const $bubblecontainer = $('.bubble-container');
+			const $heading = $('.heading');
+			const $personas = $('.user-persona-container');
+			const $advertisement = $('.advertisement');
+			const $spinner = $('#spinner-cube');
+			const $overlay = $('#overlay');
+			const $logo = $('.logo');
+			const $contentSection = $('.content-section');
+			let bgColor = undefined;
+
+			
+			$advertisement.css('display', 'none');
+			$contentSection.css('display', 'none');
+
+			// $overlay.css('display', 'flex');
+			$spinner.css('display', 'block');
+
+			// Animate heading to disappear
+			$heading.hide();
+
+			// Animate personas to the top and shrink
+			$personas.addClass('shrink');
+			$personas.children().each(function() {
+				const $persona = $(this);
+				if ($persona.find('.persona-title').text().toLowerCase() === userType.toLowerCase()) {
+					$persona.addClass('selected').removeClass('unselected');
+					// Change spinner cube color to match selected persona
+					const color = $persona.css('background');
+					$('.cube-face').css('background', color);
+					bgColor = color;
+				} else {
+					$persona.addClass('unselected').removeClass('selected');
+				}
+			});
+
+			setTimeout(() => {
+				$('body').css('background', bgColor);
+			}, 500);
+
+			setTimeout(() => {
+				$overlay.css('display', 'none');
+				$spinner.css('display', 'none');
+				let personaData = bubblesJSON[userType.toLowerCase()];
+				
+				let shadeFactor = 0.1; // Factor to lighten (positive) or darken (negative) the color
+
+				let lighterColor = $.Color(bgColor).lightness('+=' + shadeFactor);
+				let darkerColor = $.Color(bgColor).lightness('-=' + shadeFactor);
+
+				$advertisement.css('display', 'block');
+				$('.card').each(function(index) {
+	
+					//let shadeFactor = 0.08 * (index + 1); // Factor to lighten (positive) or darken (negative) the color
+
+					//let lighterColor = $.Color(bgColor).lightness('+=' + shadeFactor);
+					//let darkerColor = $.Color(bgColor).lightness('-=' + shadeFactor);
+					
+					$(this).css('animation-delay', index * 0.3 + 's').addClass('rise-bubble');
+					
+					if (personaData.experienceShadeType === 'light') {
+						$(this).css('background', lighterColor);
+					} else {
+						$(this).css('background', darkerColor);
+					}
+
+					let experience = personaData.experiences[index];
+					$(this).find('.icon').attr('class', 'icon fa ' + experience.icon);
+					$(this).find('.experience-heading').text(experience.heading);
+
+				});
+			}, 2500);
+		}
+
+		function goHome() {
+			const $heading = $('.heading');
+			const $personas = $('.user-persona-container');
+			const $details = $('.details');
+			const $advertisement = $('.advertisement');
+			const $logo = $('.logo');
+			const $contentSection = $('.content-section');
+
+			// Reset heading and personas
+			$heading.show();
+			$personas.css({ transform: 'translateY(0)', marginTop: '0' }).removeClass('shrink');
+			// $logo.removeClass('moved').off('click', goHome);
+			$('body').css('background', "url('./page-bg.png') no-repeat center center fixed");
+			$personas.children().each(function() {
+				$(this).removeClass('selected unselected');
+			});
+
+			// Hide details, advertisement, and content section
+			$details.hide();
+			$advertisement.hide();
+			$contentSection.hide();
+		}
+
+		function goBack() {
+			const $advertisement = $('.advertisement');
+			const $contentSection = $('.content-section');
+			$contentSection.hide();
+			$advertisement.show();
+		}
+
+		function showContent(cardType) {
+			const $advertisement = $('.advertisement');
+			const $contentSection = $('.content-section');
+			let content = 'Coming Soon...';
+
+			$contentSection.css('display', 'block');
+
+			/*switch(cardType) {
+				case 'Diversity':
+					content = `<h2>Diversity</h2><p>Details about the origin of dishes and various options available.</p>`;
+					break;
+				case 'Engagement':
+					content = `<h2>Engagement</h2><p>Details about how we keep residents engaged through food-related activities.</p>`;
+					break;
+				case 'Customization':
+					content = `<h2>Customization</h2><p>Details about how we offer custom made dishes to suit individual preferences.</p>`;
+					break;
+			}*/
+
+			$contentSection.html(`<div style="font-size:50px;">${content}</div><a class="back-button" onclick="goBack()">Back</a>`).css('display', 'block');
+			$advertisement.hide();
+		}
+
+		$(document).ready(() => {
+			$('.user-persona').on('click', function(event) {
+				const userType = $(event.currentTarget).find('.persona-title').text();
+				showDetails(event, userType);
+			});
+
+			$('.card').on('click', function(event) {
+				const cardType = $(event.currentTarget).find('h3').text();
+				showContent(cardType);
+			});
+
+			$('.back-button').on('click', goBack);
+			
+			$('.tap-overlay').on('click', function() {
+                $('.pre-landing').css('opacity', '0');
+                setTimeout(() => {
+                    $(this).hide();
+					$('.pre-landing-cube').css('display', 'none');
+                    $('.personas').addClass('show');
+                    $('.user-persona').each(function(index) {
+                        $(this).delay(index * 500).queue(function(next) {
+                            $(this).addClass('show');
+                            next();
+                        });
+                    });
+                }, 1000); // Adjust the delay to match the transition duration
+            });
+			
+		});
+    </script>
+</head>
+<body>
+	<div class="logo" onclick="goHome()">
+		<img src="./restura-logo.png" alt="restura-logo">
+	</div>
+	<div class="pre-landing">
+		<div class="tap-overlay">
+            <i class="fas fa-hand-pointer"></i>
+            <div>Tap Here to Start</div>
+        </div>
+        <div class="pre-landing-cube">
+            <div class="pre-landing-cube-face">i</div>
+            <div class="pre-landing-cube-face">i</div>
+            <div class="pre-landing-cube-face">i</div>
+            <div class="pre-landing-cube-face">i</div>
+            <div class="pre-landing-cube-face">i</div>
+            <div class="pre-landing-cube-face">i</div>
+        </div>
+		<!-- <div class="tap-overlay">
+            <img src="./taphere.jpg" alt="Tap Here">
+        </div> -->
+	</div>
+	<div class="bubble-container" style="margin-top: 10px;">
+		<div class="personas">
+			<div class="heading">
+				<h2 style="margin-top: 0;">A day in the life of...</h2>
+			</div>
+			<div class="user-persona-container">
+				<div class="user-persona c-level">
+					<div class="full">
+						<p class="title">John Silver</p>
+						<img src="ceo.png" alt="C Level Executives">
+						<p class="persona-title">Community Executive</p>
+					</div>
+				</div>
+				<div class="user-persona resident">
+					<div class="full">
+						<p class="title">Mary Ann</p>
+						<img src="resident.png" alt="Resident">
+						<p class="persona-title">Resident</p>
+					</div>
+				</div>
+				<div class="user-persona restaura">
+					<div class="full">
+						<p class="title">Robert Donovan</p>
+						<img src="chef.png" alt="C Level Executives">
+						<p class="persona-title">Restaura Staff</p>
+					</div>
+				</div>
+			</div>
+			<div id="spinner-cube" class="spinner-cube">
+				<div class="spinner-cube-inner">
+					<div class="cube-face">i</div>
+					<div class="cube-face">i</div>
+					<div class="cube-face">i</div>
+					<div class="cube-face">i</div>
+					<div class="cube-face">i</div>
+					<div class="cube-face">i</div>
+				</div>
+			</div>
+		</div>
+		<div class="details"></div>
+        <div class="advertisement">
+            <!-- <h2>What would you like to dive in ?</h2> -->
+            <div class="cards">
+                <div class="card rise-bubble">
+                    <i class="fa icon"></i>
+                    <h3 class="experience-heading"></h3>
+                </div>
+                <div class="card icon">
+                    <i class="fa icon"></i>
+                    <h3 class="experience-heading"></h3>
+                </div>
+                <div class="card rise-bubble">
+                    <i class="fa icon"></i>
+                    <h3 class="experience-heading"></h3>
+                </div>
+            </div>
+        </div>
+        <div class="content-section"></div>
+	</div>
+	<div id="overlay" class="overlay">
+        <div id="overlay-content" class="overlay-content">
+            <div id="spinner-cube" class="spinner-cube">
+                <div class="spinner-cube-inner">
+                    <div class="cube-face">i</div>
+                    <div class="cube-face">i</div>
+                    <div class="cube-face">i</div>
+                    <div class="cube-face">i</div>
+                    <div class="cube-face">i</div>
+                    <div class="cube-face">i</div>
+                </div>
+            </div>
+        </div>
+    </div>
+	<div class="footer">
+		<div style="display: flex;">
+			<!-- <div id="footer-spinner-cube" class="footer-spinner-cube">
+				<div class="footer-spinner-cube-inner">
+					<div class="footer-cube-face">i</div>
+					<div class="footer-cube-face">i</div>
+					<div class="footer-cube-face">i</div>
+					<div class="footer-cube-face">i</div>
+					<div class="footer-cube-face">i</div>
+					<div class="footer-cube-face">i</div>
+				</div>
+			</div> -->
+			
+			<span style="margin-left: 10px;">i³ Inside</span>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaura I³</title>
+    <link href='https://fonts.googleapis.com/css?family=Acme' rel='stylesheet'>
+    <style>
+        body {
+            font-family: 'Acme';
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 70%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: 18px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .version {
+            border-bottom: 1px solid #ddd;
+            padding: 20px 0;
+        }
+        .version:last-child {
+            border-bottom: none;
+        }
+        .version-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .version-header h2 {
+            margin: 0;
+        }
+        .version-header p {
+            margin: 0;
+            color: #777;
+        }
+        .version-details {
+            margin-top: 10px;
+        }
+        .version-details p {
+            margin: 5px 0;
+        }
+        .latest-version {
+            background-color: #e7f4e4;
+            border: 2px solid #4caf50;
+        }
+
+        .version-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .latest-tag {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 3px 3px;
+            border-radius: 3px;
+            margin-left: 9%;
+            font-size: 12px;
+            vertical-align: middle;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let versions = [
+                {
+                    "version": "v1",
+                    "date": "2024-07-30",
+                    "description": "Initial release of the application with landing page.",
+                    "notes": [
+                        "Feature 1: Start screen with rotating cube.",
+                        "Feature 2: User personas added."
+                    ],
+                    "link": "/v1",
+                    "isLatest": false
+                },
+                {
+                    "version": "v2",
+                    "date": "2024-08-02",
+                    "description": "Alignment and transition adjustments.",
+                    "notes": [
+                        "Improvement: User persona's alignments and transitions adjusted.",
+                    ],
+                    "link": "/v2",
+                    "isLatest": true
+                },
+                {
+                    "version": "v3",
+                    "date": "2024-08-05",
+                    "description": "Experiences UI improvements.",
+                    "notes": [
+                        "Improvement: Experience section UI layout improvements.",
+                        "Feature 1: Added resident sentiment experience section."
+                    ],
+                    "link": "/v3",
+                    "isLatest": false
+                }
+                // Additional versions can be added here
+            ];
+
+            versions.sort(function(a, b) {
+                return new Date(b.date) - new Date(a.date);
+            });
+            let versionsContainer = $('.container');
+            versions.forEach(function(version, index) {
+                let versionHTML = `
+                    <div class="version">
+                        <div class="version-header">
+                            <h2 class="version-number"><a href="${version.link}" target="_blank">${version.version}</a>
+                            ${version.isLatest ? '<span class="latest-tag">Latest</span>' : ''}</h2>
+                            <p>Release Date: ${version.date}</p>
+                        </div>
+                        <div class="version-details">
+                            <p><strong>Description:</strong> ${version.description}</p>
+                            <p><strong>Notes:</strong> 
+                                <ul>
+                                    ${version.notes.map(note => `<li>${note}</li>`).join('')}
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
+                `;
+                versionsContainer.append(versionHTML);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Release Versions</h1>
+    <div class="container">
+    </div>
+</body>
+</html>
