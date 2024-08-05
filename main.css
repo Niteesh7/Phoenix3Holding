@@ -1,0 +1,258 @@
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Acme");
+
+:root {
+  --c-level-bg: #143e57;
+  --resident-bg: #eaa432;
+  --restaura-bg: #e65032;
+}
+
+body {
+  font-family: "Acme";
+  text-align: center;
+  background: url("./page-bg.png") no-repeat center center fixed;
+  background-size: cover;
+  color: #fff;
+  transition: background-color 1s ease-in-out;
+  margin: 0;
+  overflow: hidden;
+}
+
+.bubble-container {
+  margin: 5px auto;
+  width: 80%;
+  transition: transform 1s ease-in-out;
+}
+
+.heading {
+  font-size: 36px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #fff;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.heading h2 {
+  margin-bottom: 5px;
+}
+
+.personas {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.personas.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.personas.shrink {
+  margin-bottom: 0;
+}
+
+.user-persona-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+  transform: scale(0.8);
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.user-persona {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+  padding: 20px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  position: relative;
+  opacity: 0;
+  transform: scale(0);
+  transition: transform 0.3s, box-shadow 0.3s, width 1s ease-in-out,
+    height 1s ease-in-out, font-size 1s ease-in-out, margin-top 1s ease-in-out;
+}
+
+.user-persona.show {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.user-persona:hover {
+  transform: scale(1.25);
+}
+
+.user-persona img {
+  width: 100%;
+  height: 50%;
+  border-radius: 50%;
+}
+
+.user-persona .title {
+  font-size: 22px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.user-persona .persona-title {
+  font-size: 13px;
+}
+
+.user-persona i {
+  font-size: 48px;
+  color: #fff;
+}
+
+.user-persona p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  transition: font-size 1s ease-in-out;
+}
+
+.c-level {
+  background: var(--c-level-bg);
+}
+
+.resident {
+  background: var(--resident-bg);
+}
+
+.restaura {
+  background: var(--restaura-bg);
+}
+
+.spinner-cube {
+  display: none;
+  margin: 0 auto;
+  width: 200px;
+  height: 200px;
+  perspective: 400px;
+  margin-top: 2%;
+  z-index: 1000;
+  position: absolute;
+  top: 85%;
+  opacity: 0;
+  animation: shrink-and-fade-out 3s ease-in-out;
+}
+
+.spinner-cube-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  animation: spin-cube 3s linear infinite;
+}
+
+.cube-face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 2px solid #000;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 120px;
+  font-weight: 600;
+  color: #000;
+  line-height: 200px;
+  text-align: center;
+}
+
+.spinner-cube-inner .cube-face:nth-child(1) {
+  transform: rotateY(0deg) translateZ(100px);
+}
+
+.spinner-cube-inner .cube-face:nth-child(2) {
+  transform: rotateY(90deg) translateZ(100px);
+}
+
+.spinner-cube-inner .cube-face:nth-child(3) {
+  transform: rotateY(180deg) translateZ(100px);
+}
+
+.spinner-cube-inner .cube-face:nth-child(4) {
+  transform: rotateY(270deg) translateZ(100px);
+}
+
+.spinner-cube-inner .cube-face:nth-child(5) {
+  transform: rotateX(90deg) translateZ(100px);
+}
+
+.spinner-cube-inner .cube-face:nth-child(6) {
+  transform: rotateX(-90deg) translateZ(100px);
+}
+
+.overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.overlay-content {
+  text-align: center;
+  color: #fff;
+}
+
+.home-button {
+  display: none;
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+}
+
+.home-button:hover {
+  background-color: #f0f0f0;
+}
+
+footer {
+  position: fixed;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  color: #fff;
+}
+
+@keyframes spin-cube {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+@keyframes shrink-and-fade-out {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
